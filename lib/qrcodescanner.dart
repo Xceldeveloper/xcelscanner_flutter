@@ -33,6 +33,12 @@ class _QrcodeScannerPageState extends State<QrcodeScannerPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.chevron_left,color: Colors.green,),
+          onPressed: ()=>Navigator.of(context).pop(),
+        ),
+        backgroundColor: Colors.black,title: Text("QR code Scanner",style: TextStyle(color: Colors.green),),),
       body: Column(
         children: <Widget>[
           Expanded(flex: 4, child: _buildQrView(context)),
