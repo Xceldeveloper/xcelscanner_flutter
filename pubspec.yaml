@@ -30,6 +30,7 @@ dependencies:
   cupertino_icons: ^1.0.0
 
   qr_code_scanner: ^0.3.0
+  #flutter_barcode_scanner: ^1.0.2
   #qrscan: ^0.2.21
   #qrcode: ^1.0.4
   pdf: ^2.0.0
@@ -45,6 +46,7 @@ dependencies:
   floating_action_bubble: ^1.1.2
   hawk_fab_menu: ^0.3.2
   photofilters: ^2.0.1
+  material_design_icons_flutter: 4.0.5755
 
 
 

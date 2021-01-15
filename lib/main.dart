@@ -1,162 +1,91 @@
-import 'dart:io';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:qr_code_scanner/qr_code_scanner.dart';
-
-void main() => runApp(MaterialApp(home: QRViewExample()));
-
-class QRViewExample extends StatefulWidget {
-  const QRViewExample({
-    Key key,
-  }) : super(key: key);
-
-  @override
-  State<StatefulWidget> createState() => _QRViewExampleState();
+import 'package:fab_circular_menu/fab_circular_menu.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:xcelscanner_flutter/barcodescanner.dart';
+import 'package:xcelscanner_flutter/qrcodescanner.dart';
+void main() {
+  runApp(MyApp());
 }
 
-class _QRViewExampleState extends State<QRViewExample> {
-  Barcode result;
-  QRViewController controller;
-  final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
-
-  // In order to get hot reload to work we need to pause the camera if the platform
-  // is android, or resume the camera if the platform is iOS.
-  @override
-  void reassemble() {
-    super.reassemble();
-    if (Platform.isAndroid) {
-      controller.pauseCamera();
-    } else if (Platform.isIOS) {
-      controller.resumeCamera();
-    }
-  }
+class MyApp extends StatelessWidget {
+  final GlobalKey<FabCircularMenuState> fabKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        children: <Widget>[
-          Expanded(flex: 4, child: _buildQrView(context)),
-          Expanded(
-            flex: 1,
-            child: FittedBox(
-              fit: BoxFit.contain,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  if (result != null)
-                    Text(
-                        'Barcode Type: ${describeEnum(result.format)}   Data: ${result.code}')
-                  else
-                    Text('Scan a code'),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      Container(
-                        margin: EdgeInsets.all(8),
-                        child: RaisedButton(
-                            onPressed: () => setState(() {
-                                  controller?.toggleFlash();
-                                }),
-                            child: FutureBuilder(
-                              future: controller?.getFlashStatus(),
-                              builder: (context, snapshot) {
-                                return Text('Flash: ${snapshot.data}');
-                              },
-                            )),
-                      ),
-                      Container(
-                        margin: EdgeInsets.all(8),
-                        child: RaisedButton(
-                            onPressed: () => setState(() {
-                                  controller?.flipCamera();
-                                }),
-                            child: FutureBuilder(
-                              future: controller?.getCameraInfo(),
-                              builder: (context, snapshot) {
-                                if (snapshot.data != null) {
-                                  return Text(
-                                      'Camera facing ${describeEnum(snapshot.data)}');
-                                } else {
-                                  return Text('loading');
-                                }
-                              },
-                            )),
-                      )
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      Container(
-                        margin: EdgeInsets.all(8),
-                        child: RaisedButton(
-                          onPressed: () {
-                            controller?.pauseCamera();
-                          },
-                          child: Text('pause', style: TextStyle(fontSize: 20)),
-                        ),
-                      ),
-                      Container(
-                        margin: EdgeInsets.all(8),
-                        child: RaisedButton(
-                          onPressed: () {
-                            controller?.resumeCamera();
-                          },
-                          child: Text('resume', style: TextStyle(fontSize: 20)),
-                        ),
-                      )
-                    ],
-                  ),
-                ],
+    final primaryColor = Theme.of(context).primaryColor;
+
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        body: Container(
+          color:Colors.black87,
+          child: Center(
+            child: Text("XcelScanner",style: TextStyle(color: Colors.white,fontSize: 35),)
+          ),
+        ),
+        floatingActionButton: Builder(
+          builder: (context) => FabCircularMenu(
+            key: fabKey,
+            // Cannot be `Alignment.center`
+            alignment: Alignment.bottomRight,
+            ringColor: Colors.white.withAlpha(25),
+            ringDiameter: 500.0,
+            ringWidth: 150.0,
+            fabSize: 64.0,
+            fabElevation: 8.0,
+            fabIconBorder: CircleBorder(),
+            // Also can use specific color based on wether
+            // the menu is open or not:
+            // fabOpenColor: Colors.white
+            // fabCloseColor: Colors.white
+            // These properties take precedence over fabColor
+            fabColor: Colors.white,
+            fabOpenIcon: Icon(Icons.menu, color: primaryColor),
+            fabCloseIcon: Icon(Icons.close, color: primaryColor),
+            fabMargin: const EdgeInsets.all(16.0),
+            animationDuration: const Duration(milliseconds: 800),
+            animationCurve: Curves.easeInOutCirc,
+            onDisplayChange: (isOpen) {
+
+            },
+            children: <Widget>[
+              RawMaterialButton(
+                onPressed: () {
+                  Navigator.of(context)
+                      .push(MaterialPageRoute(builder: (context) => QrcodeScannerPage()));
+                },
+                shape: CircleBorder(),
+                padding: const EdgeInsets.all(24.0),
+                child: Icon(MdiIcons.qrcodeScan, color: Colors.white,size: 40,),
               ),
-            ),
-          )
-        ],
+              RawMaterialButton(
+                onPressed: () {
+
+                },
+                shape: CircleBorder(),
+                padding: const EdgeInsets.all(24.0),
+                child: Icon(Icons.picture_as_pdf_outlined, color: Colors.white,size: 40,),
+              ),
+              RawMaterialButton(
+                onPressed: () {
+                  Navigator.of(context)
+                      .push(MaterialPageRoute(builder: (context) => BarCodeScannerPage()));
+                },
+                shape: CircleBorder(),
+                padding: const EdgeInsets.all(24.0),
+                child: Icon(MdiIcons.barcodeScan, color: Colors.white,size: 40,),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
 
-  Widget _buildQrView(BuildContext context) {
-    // For this example we check how width or tall the device is and change the scanArea and overlay accordingly.
-    var scanArea = (MediaQuery.of(context).size.width < 400 ||
-            MediaQuery.of(context).size.height < 400)
-        ? 150.0
-        : 300.0;
-    // To ensure the Scanner view is properly sizes after rotation
-    // we need to listen for Flutter SizeChanged notification and update controller
-    return QRView(
-      key: qrKey,
-      cameraFacing: CameraFacing.front,
-      onQRViewCreated: _onQRViewCreated,
-      formatsAllowed: [BarcodeFormat.qrcode],
-      overlay: QrScannerOverlayShape(
-        borderColor: Colors.red,
-        borderRadius: 10,
-        borderLength: 30,
-        borderWidth: 10,
-        cutOutSize: scanArea,
-      ),
-    );
-  }
-
-  void _onQRViewCreated(QRViewController controller) {
-    setState(() {
-      this.controller = controller;
-    });
-    controller.scannedDataStream.listen((scanData) {
-      setState(() {
-        result = scanData;
-      });
-    });
-  }
-
-  @override
-  void dispose() {
-    controller.dispose();
-    super.dispose();
+  void _showSnackBar(BuildContext context, String message) {
+    Scaffold.of(context).showSnackBar(SnackBar(
+      content: Text(message),
+      duration: const Duration(milliseconds: 1000),
+    ));
   }
 }
