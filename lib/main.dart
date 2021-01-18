@@ -3,6 +3,7 @@ import 'package:fab_circular_menu/fab_circular_menu.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:xcelscanner_flutter/barcodescanner.dart';
 import 'package:xcelscanner_flutter/qrcodescanner.dart';
+import 'package:xcelscanner_flutter/colorpicker.dart';
 void main() {
   runApp(MyApp());
 }
@@ -51,7 +52,8 @@ class MyApp extends StatelessWidget {
             children: <Widget>[
               RawMaterialButton(
                 onPressed: () {
-
+                  Navigator.of(context)
+                      .push(MaterialPageRoute(builder: (context) => ColorPickerPage()));
                 },
                 shape: CircleBorder(),
                 padding: const EdgeInsets.all(24.0),
